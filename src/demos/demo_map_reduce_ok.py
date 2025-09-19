@@ -126,6 +126,7 @@ def setup_task_relationships() -> str:
 
 # ==================== DEMONSTRATION ORCHESTRATION ====================
 
+
 @task(name="demo_map_reduce")
 def demo_map_reduce():
     print("\n" + "=" * 80)
