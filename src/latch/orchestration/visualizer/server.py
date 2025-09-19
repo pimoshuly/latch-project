@@ -344,7 +344,7 @@ class DAGNetworkXVisualizer:
                         y=text_y,  # Position at middle top of edge
                         xref="x",
                         yref="y",
-                        text=edge_data.get("label", "❌ VIOLATION"),
+                        text=edge_data.get("label", "X VIOLATION"),
                         showarrow=False,
                         font=dict(size=10, color="white"),
                         bgcolor="rgba(255, 68, 68, 0.9)",  # Red background

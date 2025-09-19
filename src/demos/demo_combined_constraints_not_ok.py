@@ -98,7 +98,7 @@ def alert_service():
 
 @task(name="system_coordinator")
 def system_coordinator():
-    print("[COORD] 🎯 System coordinator managing workflow...")
+    print("[COORD] System coordinator managing workflow...")
     time.sleep(2)
 
 
@@ -140,7 +140,7 @@ def setup_task_relationships() -> str:
 @task(name="demo_combined_constraints")
 def demo_combined_constraints():
     print("\n" + "=" * 80)
-    print("🎯 DEMO: COMBINED INCOMING & OUTGOING CONSTRAINTS (SUCCESS)")
+    print("DEMO: COMBINED INCOMING & OUTGOING CONSTRAINTS (FAIL)")
     print("=" * 80)
 
 

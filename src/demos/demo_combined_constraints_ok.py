@@ -137,7 +137,7 @@ def setup_task_relationships() -> str:
 @task(name="demo_combined_constraints")
 def demo_combined_constraints():
     print("\n" + "=" * 80)
-    print("🎯 DEMO: COMBINED INCOMING & OUTGOING CONSTRAINTS (SUCCESS)")
+    print("DEMO: COMBINED INCOMING & OUTGOING CONSTRAINTS (SUCCESS)")
     print("=" * 80)
 
 
