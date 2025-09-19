@@ -59,21 +59,14 @@ def process_big():
     constraints=Constraints(allow_outgoing_to_names=["assess_data", "process_small"]),
 )
 def restricted_orchestrator():
-    """Restricted orchestrator - only allowed to call assess_data and process_small."""
     print("\n" + "=" * 60)
     print("RESTRICTED ORCHESTRATOR EXECUTING")
-    print("=" * 60)
-    print("NOTE: Outgoing constraints are enforced during direct task calls.")
-    print("With scheduler-driven execution, there are no direct calls to validate.")
-    print("=" * 60)
 
 
 @task(name="unrestricted_orchestrator")
 def unrestricted_orchestrator():
-    """Unrestricted orchestrator - can call any tasks."""
     print("\n" + "=" * 60)
     print("UNRESTRICTED ORCHESTRATOR EXECUTING")
-    print("=" * 60)
 
 
 # ==================== EXPLICIT PATH RELATIONSHIPS ====================
@@ -108,7 +101,6 @@ def setup_task_relationships() -> str:
 
 @task(name="demo_outgoing_constraints")
 def demo_outgoing_constraints():
-    """Demonstrate outgoing constraint validation with scheduler-driven execution."""
     print("\n" + "=" * 80)
     print("DEMO: OUTGOING CONSTRAINT VALIDATION")
     print("=" * 80)
@@ -125,4 +117,3 @@ if __name__ == "__main__":
 
     results = scheduler.execute_dag()
     print(f"\n[MAIN] Execution results: {len(results)} tasks completed")
-    print(f"[MAIN] Final result: {results.get(root_task_name, 'No result')}")

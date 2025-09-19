@@ -17,7 +17,6 @@ from latch.orchestration.constraints import Constraints
 
 @task(name="assess_data")
 def assess_data():
-    """Assess data and determine processing approach."""
     print("[ASSESSMENT] Assessing data...")
     time.sleep(2)
 
@@ -39,14 +38,12 @@ def assess_data():
 
 @task(name="process_small")
 def process_small():
-    """Process small data."""
     print("[PROCESS] Processing small data...")
     time.sleep(2)
 
 
 @task(name="process_big")
 def process_big():
-    """Process big data."""
     print("[PROCESS] Processing big data...")
     time.sleep(2)
 
@@ -59,45 +56,28 @@ def process_big():
     constraints=Constraints(allow_outgoing_to_names=["assess_data", "process_small"]),
 )
 def restricted_orchestrator():
-    """Restricted orchestrator - only allowed to call assess_data and process_small."""
     print("\n" + "=" * 60)
     print("RESTRICTED ORCHESTRATOR EXECUTING")
-    print("=" * 60)
-    print("NOTE: Outgoing constraints are enforced during direct task calls.")
-    print("With scheduler-driven execution, there are no direct calls to validate.")
-    print("=" * 60)
-
 
 @task(name="unrestricted_orchestrator")
 def unrestricted_orchestrator():
-    """Unrestricted orchestrator - can call any tasks."""
     print("\n" + "=" * 60)
     print("UNRESTRICTED ORCHESTRATOR EXECUTING")
-    print("=" * 60)
 
 
 # ==================== EXPLICIT PATH RELATIONSHIPS ====================
 
 
 def setup_task_relationships() -> str:
-    """Setup explicit caller-callee relationships using Path construct.
-
-    Returns:
-        str: The unique name of the root task in the graph
-    """
-
-    # Assessment task calls processing tasks conditionally
     restricted_orchestrator.create_path_to(process_small)
     restricted_orchestrator.create_path_to(process_big)
 
     unrestricted_orchestrator.create_path_to(process_small)
     unrestricted_orchestrator.create_path_to(process_big)
 
-    # Orchestrators call assess_data
     restricted_orchestrator.create_path_to(assess_data)
     unrestricted_orchestrator.create_path_to(assess_data)
 
-    # Main demo calls both orchestrators
     demo_outgoing_constraints.create_path_to(restricted_orchestrator)
     demo_outgoing_constraints.create_path_to(unrestricted_orchestrator)
 
@@ -113,10 +93,6 @@ def demo_outgoing_constraints():
     print("\n" + "=" * 80)
     print("DEMO: OUTGOING CONSTRAINT VALIDATION")
     print("=" * 80)
-    print("NOTE: Outgoing constraints are enforced during direct task calls.")
-    print("With scheduler-driven execution, there are no direct calls to validate.")
-    print("This demo will complete all tasks successfully via scheduler.")
-    print("=" * 80)
 
 
 if __name__ == "__main__":
@@ -130,4 +106,3 @@ if __name__ == "__main__":
 
     results = scheduler.execute_dag()
     print(f"\n[MAIN] Execution results: {len(results)} tasks completed")
-    print(f"[MAIN] Final result: {results.get(root_task_name, 'No result')}")

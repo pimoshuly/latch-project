@@ -11,8 +11,6 @@ from latch.orchestration.constraints import Constraints
 
 
 # ==================== DATA SOURCE ====================
-
-
 @task(
     name="data_source",
     constraints=Constraints(
@@ -21,13 +19,10 @@ from latch.orchestration.constraints import Constraints
 )
 def data_source():
     print("[SOURCE] Data source preparing data for mapping...")
-    print("[SOURCE] Splitting data into 5 chunks for parallel processing")
     time.sleep(2)
 
 
 # ==================== MAPPERS ====================
-
-
 @task(
     name="mapper1",
     constraints=Constraints(
@@ -36,7 +31,6 @@ def data_source():
 )
 def mapper1():
     print("[MAP1]  Mapper 1 processing data chunk...")
-    print("[MAP1]  Applying transformation function to data")
     time.sleep(2)
 
 
@@ -48,7 +42,6 @@ def mapper1():
 )
 def mapper2():
     print("[MAP2]  Mapper 2 processing data chunk...")
-    print("[MAP2] Applying transformation function to data")
     time.sleep(2)
 
 
@@ -60,7 +53,6 @@ def mapper2():
 )
 def mapper3():
     print("[MAP3] Mapper 3 processing data chunk...")
-    print("[MAP3] Applying transformation function to data")
     time.sleep(2)
 
 
@@ -89,8 +81,6 @@ def mapper5():
 
 
 # ==================== REDUCER ====================
-
-
 @task(
     name="reducer",
     constraints=Constraints(
@@ -111,8 +101,6 @@ def reducer():
 
 
 # ==================== EXPLICIT PATH RELATIONSHIPS ====================
-
-
 def setup_task_relationships() -> str:
     print("[SETUP] Creating map-reduce constraint-compliant task relationships...")
 
@@ -138,13 +126,11 @@ def setup_task_relationships() -> str:
 
 # ==================== DEMONSTRATION ORCHESTRATION ====================
 
-
 @task(name="demo_map_reduce")
 def demo_map_reduce():
-    """Demonstrate successful map-reduce pattern with constraint validation."""
     print("\n" + "=" * 80)
-    print("🎯 DEMO: MAP-REDUCE PATTERN WITH CONSTRAINTS (SUCCESS)")
-    print("=" * 80)
+    print("DEMO: MAP-REDUCE PATTERN WITH CONSTRAINTS (SUCCESS)")
+    time.sleep(3)
 
 
 if __name__ == "__main__":

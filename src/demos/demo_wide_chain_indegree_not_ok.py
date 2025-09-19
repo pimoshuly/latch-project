@@ -12,12 +12,9 @@ from latch.orchestration.constraints import Constraints
 
 
 # ==================== WIDE CHAIN OF TASKS ====================
-# Sequential processing pipeline with 10+ steps called by orchestrator
-
 
 @task(name="step1_ingest")
 def step1_ingest():
-    """Step 1: Data ingestion from source."""
     print(f"[CHAIN] Step 1: Ingesting data from source")
     time.sleep(2)  # Simulate processing time
     last_aggregator()  # Internal call 1
@@ -25,7 +22,6 @@ def step1_ingest():
 
 @task(name="step2_validate")
 def step2_validate():
-    """Step 2: Validate incoming data."""
     print(f"[CHAIN] Step 2: Validating data")
     time.sleep(2)  # Simulate processing time
     last_aggregator()  # Internal call 2
@@ -33,7 +29,6 @@ def step2_validate():
 
 @task(name="step3_parse")
 def step3_parse():
-    """Step 3: Parse data structure."""
     print(f"[CHAIN] Step 3: Parsing data")
     time.sleep(2)  # Simulate processing time
     last_aggregator()  # Internal call 3
@@ -41,7 +36,6 @@ def step3_parse():
 
 @task(name="step4_clean")
 def step4_clean():
-    """Step 4: Clean and normalize data."""
     print(f"[CHAIN] Step 4: Cleaning data")
     time.sleep(2)  # Simulate processing time
     last_aggregator()  # Internal call 4
@@ -49,7 +43,6 @@ def step4_clean():
 
 @task(name="step5_enrich")
 def step5_enrich():
-    """Step 5: Enrich with external data."""
     print(f"[CHAIN] Step 5: Enriching data")
     time.sleep(2)  # Simulate processing time
     last_aggregator()  # Internal call 5 - This should still work (limit is 5)
@@ -57,7 +50,6 @@ def step5_enrich():
 
 @task(name="step6_transform")
 def step6_transform():
-    """Step 6: Apply business transformations."""
     print(f"[CHAIN] Step 6: Transforming data")
     time.sleep(4)  # Simulate processing time
     last_aggregator()  # Internal call 6 - This should FAIL due to indegree limit
@@ -65,7 +57,6 @@ def step6_transform():
 
 @task(name="step7_aggregate")
 def step7_aggregate():
-    """Step 7: Aggregate data by key dimensions."""
     print(f"[CHAIN] Step 7: Aggregating data")
     time.sleep(2)  # Simulate processing time
     last_aggregator()  # Internal call 7 - This should also fail
@@ -73,7 +64,6 @@ def step7_aggregate():
 
 @task(name="step8_score")
 def step8_score():
-    """Step 8: Calculate quality scores."""
     print(f"[CHAIN] Step 8: Scoring data")
     time.sleep(2)  # Simulate processing time
     last_aggregator()  # Internal call 8 - This should also fail
@@ -81,7 +71,6 @@ def step8_score():
 
 @task(name="step9_rank")
 def step9_rank():
-    """Step 9: Rank and prioritize results."""
     print(f"[CHAIN] Step 9: Ranking data")
     time.sleep(2)  # Simulate processing time
     last_aggregator()  # Internal call 9 - This should also fail
@@ -89,7 +78,6 @@ def step9_rank():
 
 @task(name="step10_finalize")
 def step10_finalize():
-    """Step 10: Finalize processing pipeline."""
     print(f"[CHAIN] Step 10: Finalizing data")
     time.sleep(2)  # Simulate processing time
     last_aggregator()  # Internal call 10 - This should also fail
@@ -97,7 +85,6 @@ def step10_finalize():
 
 @task(name="last_aggregator", constraints=Constraints(limit_indegree=5))
 def last_aggregator():
-    """Last: Aggregate the processing artifacts."""
     print(f"[CHAIN] Last: Aggregating...")
     time.sleep(2)  # Simulate processing time
 
@@ -106,12 +93,6 @@ def last_aggregator():
 
 
 def setup_task_relationships() -> str:
-    """Setup explicit caller-callee relationships using Path construct.
-
-    Returns:
-        str: The unique name of the root task in the graph
-    """
-
     # Each step task calls last_aggregator
     step1_ingest.create_path_to(last_aggregator)
     step2_validate.create_path_to(last_aggregator)
@@ -144,7 +125,6 @@ def setup_task_relationships() -> str:
 
 @task(name="demo_wide_chain")
 def demo_wide_chain():
-    """Demonstrate wide chain with each step internally calling last_aggregator (indegree constraint test)."""
     print("\n" + "=" * 60)
     print("DEMO: WIDE CHAIN PROCESSING WITH INDEGREE CONSTRAINT")
     print("=" * 60)
@@ -161,4 +141,3 @@ if __name__ == "__main__":
 
     results = scheduler.execute_dag()
     print(f"\n[MAIN] Execution results: {len(results)} tasks completed")
-    print(f"[MAIN] Final result: {results.get(root_task_name, 'No result')}")

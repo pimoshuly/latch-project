@@ -21,7 +21,6 @@ from latch.orchestration.constraints import Constraints
 )
 def data_source():
     print("[SOURCE] Data source preparing data for mapping...")
-    print("[SOURCE] Splitting data into 5 chunks for parallel processing")
     data_source.create_path_to(reducer)  # failure case
     time.sleep(2)
 
@@ -37,7 +36,6 @@ def data_source():
 )
 def mapper1():
     print("[MAP1]  Mapper 1 processing data chunk...")
-    print("[MAP1]  Applying transformation function to data")
     time.sleep(2)
 
 
@@ -49,7 +47,6 @@ def mapper1():
 )
 def mapper2():
     print("[MAP2]  Mapper 2 processing data chunk...")
-    print("[MAP2] Applying transformation function to data")
     time.sleep(2)
 
 
@@ -61,7 +58,6 @@ def mapper2():
 )
 def mapper3():
     print("[MAP3] Mapper 3 processing data chunk...")
-    print("[MAP3] Applying transformation function to data")
     time.sleep(2)
 
 
@@ -85,7 +81,6 @@ def mapper4():
 )
 def mapper5():
     print("[MAP5] Mapper 5 processing data chunk...")
-    print("[MAP5] Applying transformation function to data")
     time.sleep(2)
 
 
@@ -106,8 +101,6 @@ def mapper5():
 )
 def reducer():
     print("[REDUCE] Reducer combining results from all 5 mappers...")
-    print("[REDUCE] Applying reduction function to combine data")
-    print("[REDUCE] Map-reduce operation completed successfully")
     time.sleep(2)
 
 
@@ -142,10 +135,9 @@ def setup_task_relationships() -> str:
 
 @task(name="demo_map_reduce")
 def demo_map_reduce():
-    """Demonstrate successful map-reduce pattern with constraint validation."""
     print("\n" + "=" * 80)
-    print("🎯 DEMO: MAP-REDUCE PATTERN WITH CONSTRAINTS (SUCCESS)")
-    print("=" * 80)
+    print("DEMO: MAP-REDUCE PATTERN WITH CONSTRAINTS (SUCCESS)")
+    time.sleep(5)
 
 
 if __name__ == "__main__":
