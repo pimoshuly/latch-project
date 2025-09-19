@@ -189,30 +189,141 @@ class DAGNetworkXVisualizer:
         # Create figure
         fig = go.Figure()
 
-        # Add edges
+        # Add edges with arrows
         edge_x, edge_y = [], []
         edge_info = []
+        annotations = []
+
+        # Node size for edge intersection calculation (matching the marker size)
+        node_size = 60
+        # Convert from plotly marker size to actual coordinate space
+        # Plotly marker size is in "points", need to estimate coordinate space equivalent
+        # Increased boundary size to ensure visible separation from node centers
+        node_half_width = 0.2   # Approximate half-width of square nodes in coordinate space
+        node_half_height = 0.15  # Approximate half-height of square nodes in coordinate space
+
+        def calculate_edge_endpoints(x0, y0, x1, y1):
+            """Calculate edge start and end points at the boundaries of square nodes."""
+            import math
+
+            # Calculate direction vector
+            dx = x1 - x0
+            dy = y1 - y0
+
+            if dx == 0 and dy == 0:
+                return x0, y0, x1, y1
+
+            # Calculate intersection with source node boundary
+            if abs(dx) > abs(dy):
+                # Line is more horizontal, intersect with left/right edge
+                if dx > 0:
+                    start_x = x0 + node_half_width
+                    start_y = y0 + (node_half_width * dy / dx)
+                else:
+                    start_x = x0 - node_half_width
+                    start_y = y0 - (node_half_width * dy / dx)
+            else:
+                # Line is more vertical, intersect with top/bottom edge
+                if dy > 0:
+                    start_y = y0 + node_half_height
+                    start_x = x0 + (node_half_height * dx / dy)
+                else:
+                    start_y = y0 - node_half_height
+                    start_x = x0 - (node_half_height * dx / dy)
+
+            # Calculate intersection with target node boundary
+            if abs(dx) > abs(dy):
+                # Line is more horizontal, intersect with left/right edge
+                if dx > 0:
+                    end_x = x1 - node_half_width
+                    end_y = y1 - (node_half_width * dy / dx)
+                else:
+                    end_x = x1 + node_half_width
+                    end_y = y1 + (node_half_width * dy / dx)
+            else:
+                # Line is more vertical, intersect with top/bottom edge
+                if dy > 0:
+                    end_y = y1 - node_half_height
+                    end_x = x1 - (node_half_height * dx / dy)
+                else:
+                    end_y = y1 + node_half_height
+                    end_x = x1 + (node_half_height * dx / dy)
+
+            return start_x, start_y, end_x, end_y
 
         for edge in self.graph.edges():
             x0, y0 = pos[edge[0]]
             x1, y1 = pos[edge[1]]
 
-            # Add edge line
-            edge_x.extend([x0, x1, None])
-            edge_y.extend([y0, y1, None])
+            # Calculate edge endpoints at node boundaries
+            start_x, start_y, end_x, end_y = calculate_edge_endpoints(x0, y0, x1, y1)
+
+            # Add edge line from boundary to boundary (using calculated boundary points)
+            edge_x.extend([start_x, end_x, None])
+            edge_y.extend([start_y, end_y, None])
 
             # Store edge info for hover
             edge_data = self.graph[edge[0]][edge[1]]
             edge_info.append(f"{edge[0]} -> {edge[1]}<br>Type: {edge_data.get('type', 'dependency')}")
 
-        # Add edge traces
+            # Determine edge color and style based on edge type
+            edge_color = '#ff4444' if edge_data.get('type') == 'violation' else '#7f8c8d'
+            edge_width = 4 if edge_data.get('type') == 'violation' else 2
+
+            # Calculate middle point of the edge for text placement (using boundary points)
+            mid_x = (start_x + end_x) / 2
+            mid_y = (start_y + end_y) / 2
+
+            # Offset the text position slightly above the middle of the edge
+            text_offset_y = abs(end_y - start_y) * 0.1 + 0.05  # Adaptive offset based on edge length
+            text_y = mid_y + text_offset_y
+
+            # Add arrow annotation for this edge (from boundary to boundary)
+            annotations.append(
+                dict(
+                    ax=start_x, ay=start_y,  # Start point at node boundary
+                    x=end_x, y=end_y,       # End point at node boundary
+                    xref='x', yref='y',
+                    axref='x', ayref='y',
+                    arrowhead=2,   # Arrow style
+                    arrowsize=1.5,
+                    arrowwidth=edge_width,
+                    arrowcolor=edge_color,
+                    showarrow=True,
+                    text='',  # Remove text from arrow itself
+                )
+            )
+
+            # Add separate text annotation at middle top of edge for violation details
+            if edge_data.get('type') == 'violation' and edge_data.get('hover_info'):
+                annotations.append(
+                    dict(
+                        x=mid_x, y=text_y,  # Position at middle top of edge
+                        xref='x', yref='y',
+                        text=edge_data.get('label', '❌ VIOLATION'),
+                        showarrow=False,
+                        font=dict(size=10, color='white'),
+                        bgcolor='rgba(255, 68, 68, 0.9)',  # Red background
+                        bordercolor='#ff4444',
+                        borderwidth=2,
+                        borderpad=4,
+                        hovertext=edge_data.get('hover_info', ''),
+                        hoverlabel=dict(
+                            bgcolor='rgba(255, 255, 255, 0.95)',
+                            bordercolor='#ff4444',
+                            font=dict(size=12, color='black')
+                        )
+                    )
+                )
+
+        # Add edge traces (lighter lines behind arrows)
         fig.add_trace(go.Scatter(
             x=edge_x, y=edge_y,
             mode='lines',
-            line=dict(width=2, color='#7f8c8d'),
+            line=dict(width=1, color='rgba(127, 140, 157, 0.3)'),
             hoverinfo='none',
             showlegend=False,
-            name='Edges'
+            name='Edge Lines'
         ))
 
         # Add nodes as rectangles using shapes and text
@@ -331,7 +442,8 @@ class DAGNetworkXVisualizer:
             xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
             yaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
             plot_bgcolor='white',
-            autosize=True  # Allow responsive sizing
+            autosize=True,  # Allow responsive sizing
+            annotations=annotations  # Add arrow annotations
         )
 
         # Return as HTML string

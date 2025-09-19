@@ -26,6 +26,10 @@ class TaskRegistry:
         self._active_tasks: Set[str] = set()
         self._constraint_validator: Optional['ConstraintValidator'] = None
 
+        # Initialize violation handler
+        from .violation import ConstraintViolationHandler
+        self._violation_handler = ConstraintViolationHandler(self._get_display_name)
+
     @property
     def execution_plan_dag(self) -> 'TaskDependencyDAG':
         if self._execution_plan is None:
@@ -55,6 +59,20 @@ class TaskRegistry:
     def get_task(self, name: str) -> Optional['Task']:
         return self._tasks.get(name)
 
+    def _handle_constraint_violation(self, caller_task: str, callee_task: str, error: Exception) -> None:
+        """Handle constraint validation failure using the violation handler."""
+        self._violation_handler.handle_constraint_violation(caller_task, callee_task, error)
+
+    def _get_display_name(self, task_name: str) -> str:
+        """Get display name for a task, extracting base name from unique task name."""
+        task = self._tasks.get(task_name)
+        if task:
+            metadata = self._task_metadata.get(task_name, {})
+            return metadata.get('base_name', task_name)
+        # Extract base name from unique task name (format: base_name_hash)
+        if '_' in task_name:
+            return '_'.join(task_name.split('_')[:-1])
+        return task_name
 
     def add_runtime_dependency(self, caller_task: str, callee_task: str, caller_instance: 'Task') -> None:
         with self._lock:
@@ -63,7 +81,11 @@ class TaskRegistry:
             if callee_instance:
                 self.execution_plan_dag.add_task(callee_task)
 
-            self.constraint_validator.validate_dependency(caller_task, callee_task, caller_instance)
+            try:
+                self.constraint_validator.validate_dependency(caller_task, callee_task, caller_instance)
+            except Exception as e:
+                self._handle_constraint_violation(caller_task, callee_task, e)
+                raise e
 
             self.execution_plan_dag.add_dependency(callee_task, caller_task)
 
@@ -79,7 +101,7 @@ class TaskRegistry:
             })
             print(f"[REGISTRY] Task started: {task_name}")
 
-    def mark_task_completed(self, task_name: str, result: Any = None) -> None:
+    def mark_task_completed(self, task_name: str) -> None:
         with self._lock:
             self._active_tasks.discard(task_name)
 
@@ -253,7 +275,7 @@ class TaskRegistry:
 
             if event_type == 'completed':
                 task_status[task_name] = 'completed'
-                task_errors.pop(task_name, None) 
+                task_errors.pop(task_name, None)
             elif event_type == 'failed':
                 task_status[task_name] = 'failed'
                 task_errors[task_name] = event.get('error', 'Unknown error')
@@ -268,6 +290,7 @@ class TaskRegistry:
             node['status'] = status
             if task_name in task_errors:
                 node['error'] = task_errors[task_name]
+
 
 # Global task registry instance
 _task_registry: Optional[TaskRegistry] = None
