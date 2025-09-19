@@ -12,12 +12,12 @@ from latch.orchestration.constraints import Constraints
 
 # ==================== CALLER TASKS ====================
 
+
 @task(name="authorized_caller")
 def authorized_caller():
     """Authorized caller - should succeed calling protected_resource."""
     print("[CALLER] Authorized caller executing...")
     time.sleep(2)
-
 
 
 @task(name="unauthorized_caller")
@@ -27,7 +27,6 @@ def unauthorized_caller():
     time.sleep(2)
 
 
-
 @task(name="orchestrator_caller")
 def orchestrator_caller():
     """Orchestrator caller - should succeed calling protected_resource."""
@@ -35,10 +34,15 @@ def orchestrator_caller():
     time.sleep(2)
 
 
-
 # ==================== PROTECTED RESOURCE ====================
 
-@task(name="protected_resource", constraints=Constraints(allow_incoming_from_names=["authorized_caller", "orchestrator_caller"]))
+
+@task(
+    name="protected_resource",
+    constraints=Constraints(
+        allow_incoming_from_names=["authorized_caller", "orchestrator_caller"]
+    ),
+)
 def protected_resource():
     """Protected resource - only allows calls from authorized_caller and orchestrator_caller."""
     print("[PROTECTED] Processing protected resource...")
@@ -46,6 +50,7 @@ def protected_resource():
 
 
 # ==================== EXPLICIT PATH RELATIONSHIPS ====================
+
 
 def setup_task_relationships() -> str:
     """Setup explicit caller-callee relationships using Path construct.
@@ -66,18 +71,20 @@ def setup_task_relationships() -> str:
 
     return demo_incoming_constraints.name
 
+
 # ==================== DEMONSTRATION ORCHESTRATION ====================
+
 
 @task(name="demo_incoming_constraints")
 def demo_incoming_constraints():
     """Demonstrate incoming constraint validation with scheduler-driven execution."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("DEMO: INCOMING CONSTRAINT VALIDATION")
-    print("="*60)
+    print("=" * 60)
     print("NOTE: Incoming constraints are enforced during direct task calls.")
     print("With scheduler-driven execution, there are no direct calls to validate.")
     print("This demo will complete all tasks successfully via scheduler.")
-    print("="*60)
+    print("=" * 60)
 
 
 if __name__ == "__main__":

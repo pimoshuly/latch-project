@@ -9,6 +9,7 @@ calls multiple sequential tasks in order, but the tasks don't call each other.
 import sys
 import os
 import time
+
 # Add parent directory to path so we can import latch
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -96,6 +97,7 @@ def last_aggregator():
 
 # ==================== EXPLICIT PATH RELATIONSHIPS ====================
 
+
 def setup_task_relationships() -> str:
     """Setup explicit caller-callee relationships using Path construct."""
 
@@ -125,14 +127,16 @@ def setup_task_relationships() -> str:
 
     return demo_wide_chain.name
 
+
 # ==================== DEMONSTRATION ORCHESTRATION ====================
+
 
 @task(name="demo_wide_chain")
 def demo_wide_chain():
     """Demonstrate wide chain of sequential tasks called by orchestrator."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("DEMO 1: WIDE CHAIN PROCESSING")
-    print("="*60)
+    print("=" * 60)
 
 
 if __name__ == "__main__":

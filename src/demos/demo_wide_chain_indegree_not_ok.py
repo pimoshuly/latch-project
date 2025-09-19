@@ -3,6 +3,7 @@
 import sys
 import os
 import time
+
 # Add parent directory to path so we can import latch
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -12,6 +13,7 @@ from latch.orchestration.constraints import Constraints
 
 # ==================== WIDE CHAIN OF TASKS ====================
 # Sequential processing pipeline with 10+ steps called by orchestrator
+
 
 @task(name="step1_ingest")
 def step1_ingest():
@@ -100,8 +102,8 @@ def last_aggregator():
     time.sleep(2)  # Simulate processing time
 
 
-
 # ==================== EXPLICIT PATH RELATIONSHIPS ====================
+
 
 def setup_task_relationships() -> str:
     """Setup explicit caller-callee relationships using Path construct.
@@ -136,14 +138,16 @@ def setup_task_relationships() -> str:
 
     return demo_wide_chain.name
 
+
 # ==================== DEMONSTRATION ORCHESTRATION ====================
+
 
 @task(name="demo_wide_chain")
 def demo_wide_chain():
     """Demonstrate wide chain with each step internally calling last_aggregator (indegree constraint test)."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("DEMO: WIDE CHAIN PROCESSING WITH INDEGREE CONSTRAINT")
-    print("="*60)
+    print("=" * 60)
 
 
 if __name__ == "__main__":

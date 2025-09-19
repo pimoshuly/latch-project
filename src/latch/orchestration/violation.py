@@ -10,7 +10,9 @@ class ConstraintViolationHandler:
         """
         self._get_display_name = get_display_name_func
 
-    def handle_constraint_violation(self, caller_task: str, callee_task: str, error: Exception) -> None:
+    def handle_constraint_violation(
+        self, caller_task: str, callee_task: str, error: Exception
+    ) -> None:
         """
         Handle constraint validation failure by outputting Graphviz format.
 
@@ -19,7 +21,9 @@ class ConstraintViolationHandler:
             callee_task: Name of the task being called
             error: The constraint violation exception
         """
-        print(f"[VIOLATION] Constraint validation failed: {caller_task} -> {callee_task}")
+        print(
+            f"[VIOLATION] Constraint validation failed: {caller_task} -> {callee_task}"
+        )
         print(f"[VIOLATION] Error: {str(error)}")
 
         # Generate and output Graphviz format directly
@@ -29,18 +33,20 @@ class ConstraintViolationHandler:
         """Extract a concise violation reason from the error message."""
         error_lower = error_message.lower()
 
-        if 'outgoing' in error_lower and 'not in allowed' in error_lower:
+        if "outgoing" in error_lower and "not in allowed" in error_lower:
             return "OUTGOING NOT ALLOWED"
-        elif 'incoming' in error_lower and 'not in allowed' in error_lower:
+        elif "incoming" in error_lower and "not in allowed" in error_lower:
             return "INCOMING NOT ALLOWED"
-        elif 'outgoing' in error_lower and 'limit' in error_lower:
+        elif "outgoing" in error_lower and "limit" in error_lower:
             return "OUTGOING LIMIT EXCEEDED"
-        elif 'incoming' in error_lower and 'limit' in error_lower:
+        elif "incoming" in error_lower and "limit" in error_lower:
             return "INCOMING LIMIT EXCEEDED"
         else:
             return "CONSTRAINT VIOLATION"
 
-    def _output_graphviz(self, caller_task: str, callee_task: str, error: Exception) -> None:
+    def _output_graphviz(
+        self, caller_task: str, callee_task: str, error: Exception
+    ) -> None:
         """Output Graphviz format for constraint violations."""
         try:
             graphviz_output = self._generate_graphviz(caller_task, callee_task, error)
@@ -49,7 +55,9 @@ class ConstraintViolationHandler:
         except Exception as graphviz_error:
             print(f"[VIOLATION] Failed to generate Graphviz output: {graphviz_error}")
 
-    def _generate_graphviz(self, caller_task: str, callee_task: str, error: Exception) -> str:
+    def _generate_graphviz(
+        self, caller_task: str, callee_task: str, error: Exception
+    ) -> str:
         """Generate Graphviz DOT format for constraint violation."""
         # Extract violation details
         violation_reason = self._extract_violation_reason(str(error))
@@ -59,8 +67,8 @@ class ConstraintViolationHandler:
 
         # Determine violation type for coloring
         error_lower = str(error).lower()
-        is_outgoing_violation = 'outgoing' in error_lower
-        is_incoming_violation = 'incoming' in error_lower
+        is_outgoing_violation = "outgoing" in error_lower
+        is_incoming_violation = "incoming" in error_lower
 
         # Set node colors
         caller_color = "lightcoral" if is_outgoing_violation else "lightyellow"
@@ -74,14 +82,14 @@ class ConstraintViolationHandler:
             "    rankdir=LR;",
             "    node [shape=box, style=filled];",
             "    edge [fontsize=10];",
-            f"    label=\"{title}\";",
+            f'    label="{title}";',
             "    labelloc=t;",
             "",
-            f"    \"{caller_task}\" [label=\"{caller_display}\", fillcolor={caller_color}];",
-            f"    \"{callee_task}\" [label=\"{callee_display}\", fillcolor={callee_color}];",
+            f'    "{caller_task}" [label="{caller_display}", fillcolor={caller_color}];',
+            f'    "{callee_task}" [label="{callee_display}", fillcolor={callee_color}];',
             "",
-            f"    \"{caller_task}\" -> \"{callee_task}\" [color=red, style=dashed, penwidth=2, label=\"X {violation_reason}\"];",
-            "}"
+            f'    "{caller_task}" -> "{callee_task}" [color=red, style=dashed, penwidth=2, label="X {violation_reason}"];',
+            "}",
         ]
 
         return "\n".join(dot_lines)

@@ -9,7 +9,7 @@ if TYPE_CHECKING:
 class Path:
     """Represents an explicit relationship between two tasks."""
 
-    def __init__(self, from_task: 'Task', to_task: 'Task'):
+    def __init__(self, from_task: "Task", to_task: "Task"):
         """
         Create a path representing a caller-callee relationship.
 
@@ -24,11 +24,10 @@ class Path:
     def _register_relationship(self) -> None:
         """Register this relationship in the task registry."""
         from .registry import get_task_registry
+
         registry = get_task_registry()
         registry.add_runtime_dependency(
-            self.from_task.name,
-            self.to_task.name,
-            self.from_task
+            self.from_task.name, self.to_task.name, self.from_task
         )
 
     def __repr__(self) -> str:

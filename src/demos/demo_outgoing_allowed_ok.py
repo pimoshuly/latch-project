@@ -14,6 +14,7 @@ from latch.orchestration.constraints import Constraints
 
 # ==================== ASSESSMENT ====================
 
+
 @task(name="assess_data")
 def assess_data():
     """Assess data and determine processing approach."""
@@ -35,6 +36,7 @@ def assess_data():
 
 # ==================== PROCESSING TASKS ====================
 
+
 @task(name="process_small")
 def process_small():
     """Process small data."""
@@ -51,26 +53,31 @@ def process_big():
 
 # ==================== ORCHESTRATOR WITH CONSTRAINTS ====================
 
-@task(name="restricted_orchestrator", constraints=Constraints(allow_outgoing_to_names=["assess_data", "process_small"]))
+
+@task(
+    name="restricted_orchestrator",
+    constraints=Constraints(allow_outgoing_to_names=["assess_data", "process_small"]),
+)
 def restricted_orchestrator():
     """Restricted orchestrator - only allowed to call assess_data and process_small."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("RESTRICTED ORCHESTRATOR EXECUTING")
-    print("="*60)
+    print("=" * 60)
     print("NOTE: Outgoing constraints are enforced during direct task calls.")
     print("With scheduler-driven execution, there are no direct calls to validate.")
-    print("="*60)
+    print("=" * 60)
 
 
 @task(name="unrestricted_orchestrator")
 def unrestricted_orchestrator():
     """Unrestricted orchestrator - can call any tasks."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("UNRESTRICTED ORCHESTRATOR EXECUTING")
-    print("="*60)
+    print("=" * 60)
 
 
 # ==================== EXPLICIT PATH RELATIONSHIPS ====================
+
 
 def setup_task_relationships() -> str:
     """Setup explicit caller-callee relationships using Path construct.
@@ -95,14 +102,17 @@ def setup_task_relationships() -> str:
 
     return demo_outgoing_constraints.name
 
+
 # ==================== DEMONSTRATION ====================
+
 
 @task(name="demo_outgoing_constraints")
 def demo_outgoing_constraints():
     """Demonstrate outgoing constraint validation with scheduler-driven execution."""
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("DEMO: OUTGOING CONSTRAINT VALIDATION")
-    print("="*80)
+    print("=" * 80)
+
 
 if __name__ == "__main__":
     root_task_name = setup_task_relationships()

@@ -19,7 +19,6 @@ class TaskScheduler:
 
         return task(*args, **kwargs)
 
-
     def execute_dag(self) -> Dict[str, Any]:
         execution_plan = self.registry.execution_plan
         print(f"[SCHEDULER] Execution plan: {' -> '.join(execution_plan)}")
@@ -50,16 +49,21 @@ class TaskScheduler:
                     print(f"[SCHEDULER] Completed task: {task_name}")
                 except Exception as e:
                     from .constraints import ConstraintViolationError
+
                     if isinstance(e, ConstraintViolationError):
                         print(f"[SCHEDULER] CONSTRAINT VIOLATION: {e}")
-                        print(f"[SCHEDULER] Stopping execution due to constraint violation")
+                        print(
+                            f"[SCHEDULER] Stopping execution due to constraint violation"
+                        )
                         return results
                     else:
                         print(f"[SCHEDULER] Failed to execute task {task_name}: {e}")
                         # Stop execution on any failure
                         return results
 
-        print(f"[SCHEDULER] DAG execution completed. Executed {len(executed_tasks)} tasks.")
+        print(
+            f"[SCHEDULER] DAG execution completed. Executed {len(executed_tasks)} tasks."
+        )
         return results
 
     def get_execution_plan(self) -> List[str]:
@@ -79,8 +83,7 @@ class TaskScheduler:
                 # Check if all dependencies are completed
                 history = self.registry.get_execution_history()
                 completed_tasks = {
-                    event['task'] for event in history
-                    if event['event'] == 'completed'
+                    event["task"] for event in history if event["event"] == "completed"
                 }
 
                 if all(dep in completed_tasks for dep in node.dependencies):

@@ -55,7 +55,6 @@ class Task(Generic[P, R]):
         self.name = f"{base_name}_{self.instance_hash}"
         self.base_name = base_name
 
-
         self._register_in_registry()
 
     def _generate_unique_hash(self, base_name: str) -> str:
@@ -63,29 +62,31 @@ class Task(Generic[P, R]):
         hash_digest = hashlib.sha256(unique_data.encode()).hexdigest()
         return hash_digest[:8]
 
-
     def _register_in_registry(self) -> None:
         from .registry import get_task_registry
+
         registry = get_task_registry()
 
         metadata = {
-            'description': self.description,
-            'has_constraints': self.constraints is not None,
-            'base_name': self.base_name,
-            'instance_hash': self.instance_hash,
-            'unique_name': self.name
+            "description": self.description,
+            "has_constraints": self.constraints is not None,
+            "base_name": self.base_name,
+            "instance_hash": self.instance_hash,
+            "unique_name": self.name,
         }
 
         registry.register_task(self, metadata)
 
-    def create_path_to(self, to_task: 'Task') -> 'Path':
+    def create_path_to(self, to_task: "Task") -> "Path":
         """Create an explicit path from this task to another task."""
         from .path import Path
+
         return Path(from_task=self, to_task=to_task)
 
     def __call__(self, *args: P.args, **kwargs: P.kwargs) -> R:
         """Execute the task with constraint validation."""
         from .registry import get_task_registry
+
         registry = get_task_registry()
 
         try:
@@ -101,6 +102,7 @@ class Task(Generic[P, R]):
             registry.print_execution_plan()
 
             from .constraints import ConstraintViolationError
+
             if isinstance(e, ConstraintViolationError):
                 raise
 
@@ -129,6 +131,7 @@ def task(
     constraints: Optional[Constraints] = None,
 ) -> Union[Task[P, R], Callable[[Callable[P, R]], Task[P, R]]]:
     if __fn is None:
+
         def decorator(func: Callable[P, R]) -> Task[P, R]:
             return Task(
                 fn=func,
@@ -136,6 +139,7 @@ def task(
                 description=description,
                 constraints=constraints,
             )
+
         return decorator
     else:
         # Called without arguments: @task
@@ -145,5 +149,3 @@ def task(
             description=description,
             constraints=constraints,
         )
-
-

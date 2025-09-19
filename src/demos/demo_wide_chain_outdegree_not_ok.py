@@ -11,6 +11,7 @@ Constrains: outdgree
 import sys
 import os
 import time
+
 # Add parent directory to path so we can import latch
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -20,6 +21,7 @@ from latch.orchestration.constraints import Constraints
 
 # ==================== WIDE CHAIN OF TASKS ====================
 # Sequential processing pipeline with 10+ steps called by orchestrator
+
 
 @task(name="step1_ingest")
 def step1_ingest():
@@ -110,6 +112,7 @@ def last_aggregator():
 
 # ==================== EXPLICIT PATH RELATIONSHIPS ====================
 
+
 def setup_task_relationships() -> str:
     """Setup explicit caller-callee relationships using Path construct.
 
@@ -143,18 +146,20 @@ def setup_task_relationships() -> str:
 
     return demo_wide_chain.name
 
+
 # ==================== DEMONSTRATION ORCHESTRATION ====================
+
 
 @task(name="demo_wide_chain", constraints=Constraints(limit_outdegree=5))
 def demo_wide_chain():
     """Demonstrate wide chain with outdegree constraint - validates during direct calls."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("DEMO: WIDE CHAIN PROCESSING WITH OUTDEGREE CONSTRAINT")
-    print("="*60)
+    print("=" * 60)
     print("NOTE: Outdegree constraints are enforced during direct task calls.")
     print("With scheduler-driven execution, there are no direct calls to validate.")
     print("This demo will complete all tasks successfully via scheduler.")
-    print("="*60)
+    print("=" * 60)
 
 
 if __name__ == "__main__":
