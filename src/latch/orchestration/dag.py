@@ -37,7 +37,6 @@ class TaskDependencyDAG:
         dep_node.dependencies.add(dependency_task)
         prereq_node.dependents.add(dependent_task)
 
-
     def topological_sort(self) -> List[str]:
         if not self.nodes:
             return []
@@ -64,7 +63,9 @@ class TaskDependencyDAG:
         # Check for cycles
         if len(result) != len(self.nodes):
             remaining_nodes = [node for node in self.nodes if node not in result]
-            print(f"[WARNING] Cycle detected in DAG. Remaining nodes: {remaining_nodes}")
+            print(
+                f"[WARNING] Cycle detected in DAG. Remaining nodes: {remaining_nodes}"
+            )
             # Return partial result with remaining nodes appended
             result.extend(remaining_nodes)
 
@@ -82,7 +83,7 @@ class TaskDependencyDAG:
                 "type": "task",
                 "dependencies_count": len(dag_node.dependencies),
                 "dependents_count": len(dag_node.dependents),
-                "topological_position": position
+                "topological_position": position,
             }
 
             nodes.append(node_data)
@@ -95,9 +96,9 @@ class TaskDependencyDAG:
                 edge_data = {
                     "id": f"edge_{edge_id}",
                     "source": dependency,  # Source task (dependency)
-                    "target": task_name,   # Target task (dependent)
+                    "target": task_name,  # Target task (dependent)
                     "type": "dependency",
-                    "label": "depends_on"
+                    "label": "depends_on",
                 }
                 edges.append(edge_data)
                 edge_id += 1
@@ -113,7 +114,7 @@ class TaskDependencyDAG:
             "nodes": nodes,
             "edges": edges,
             "metadata": metadata,
-            "generated_at": datetime.now().isoformat()
+            "generated_at": datetime.now().isoformat(),
         }
 
     def print_dag(self) -> None:

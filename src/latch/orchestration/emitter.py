@@ -7,7 +7,9 @@ import requests
 VISUALIZATION_SERVER_URL = "http://localhost:8001/api/display"
 
 
-def emit_dag_json(dag_json: Dict[str, Any], server_url: str = VISUALIZATION_SERVER_URL) -> bool:
+def emit_dag_json(
+    dag_json: Dict[str, Any], server_url: str = VISUALIZATION_SERVER_URL
+) -> bool:
     if not dag_json:
         print("Empty DAG data provided, skipping emission")
         return False
@@ -20,10 +22,7 @@ def emit_dag_json(dag_json: Dict[str, Any], server_url: str = VISUALIZATION_SERV
         enhanced_dag_json["layout"] = {
             "algorithm": "hierarchical",
             "direction": "TB",
-            "spacing": {
-                "node": 50,
-                "rank": 100
-            }
+            "spacing": {"node": 50, "rank": 100},
         }
 
     try:
@@ -31,14 +30,16 @@ def emit_dag_json(dag_json: Dict[str, Any], server_url: str = VISUALIZATION_SERV
             server_url,
             json=enhanced_dag_json,
             headers={"Content-Type": "application/json"},
-            timeout=30
+            timeout=30,
         )
 
         if response.status_code == 200:
             print(f"Successfully emitted DAG data to {server_url}")
             return True
         else:
-            print(f"Failed to emit DAG data. Status code: {response.status_code} Server response: {response.text}")
+            print(
+                f"Failed to emit DAG data. Status code: {response.status_code} Server response: {response.text}"
+            )
             return False
     except Exception as e:
         print(f"Error while emitting DAG data: {e}")

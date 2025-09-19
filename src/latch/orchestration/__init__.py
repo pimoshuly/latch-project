@@ -1,28 +1,25 @@
 from .tasks import task, Task
 from .constraints import Constraints
-from .call_context import CallContext
+from .path import Path
 from .dag import TaskDependencyDAG, DAGNode
 from .constraints import ConstraintViolationError
 from .registry import TaskRegistry
+from .scheduler import TaskScheduler
 
 __all__ = [
     # Core decorators
     "task",
-
     # Core classes
     "Task",
     "Constraints",
-
-    # Task registry
+    # Task registry and scheduler
     "TaskRegistry",
-
-    # Call context analysis
-    "CallContext",
-
+    "TaskScheduler",
+    # Explicit task relationships
+    "Path",
     # DAG system
     "TaskDependencyDAG",
     "DAGNode",
-
     # Constraint validation
     "ConstraintViolationError",
 ]

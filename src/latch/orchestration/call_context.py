@@ -3,6 +3,7 @@ from __future__ import annotations
 import inspect
 from typing import Dict, Any
 
+
 class CallContext:
     @staticmethod
     def get_caller_info(skip_frames: int = 1) -> Dict[str, Any]:
@@ -25,7 +26,7 @@ class CallContext:
                 "task_instance": None,
                 "creation_origin": "unknown",
                 "call_chain": [],
-                "parent_task": None
+                "parent_task": None,
             }
 
         caller_function = caller_frame.function
@@ -41,17 +42,21 @@ class CallContext:
             "filename": caller_frame.filename,
             "lineno": caller_frame.lineno,
             "is_task": is_task_call,
-            "code_context": caller_frame.code_context[0].strip() if caller_frame.code_context else None,
+            "code_context": (
+                caller_frame.code_context[0].strip()
+                if caller_frame.code_context
+                else None
+            ),
             "task_instance": task_instance,
             "creation_origin": creation_origin,
             "call_chain": call_chain,
-            "parent_task": task_instance if is_task_call else None
+            "parent_task": task_instance if is_task_call else None,
         }
 
     @staticmethod
     def _is_internal_frame(frame_info: inspect.FrameInfo) -> bool:
         filename = frame_info.filename
-        internal_files = ['tasks.py', 'call_context.py']
+        internal_files = ["tasks.py", "call_context.py"]
         return any(filename.endswith(internal_file) for internal_file in internal_files)
 
     @staticmethod
@@ -59,14 +64,17 @@ class CallContext:
         for frame_info in stack:
             frame_locals = frame_info.frame.f_locals
 
-            if frame_info.function in ['__call__', '_call_sync', '_call_async']:
-                if 'self' in frame_locals:
-                    obj = frame_locals['self']
-                    if hasattr(obj, '__class__') and obj.__class__.__name__ == 'Task':
+            if frame_info.function in ["__call__", "_call_sync", "_call_async"]:
+                if "self" in frame_locals:
+                    obj = frame_locals["self"]
+                    if hasattr(obj, "__class__") and obj.__class__.__name__ == "Task":
                         return True, obj
 
             for var_value in frame_locals.values():
-                if hasattr(var_value, '__class__') and var_value.__class__.__name__ == 'Task':
+                if (
+                    hasattr(var_value, "__class__")
+                    and var_value.__class__.__name__ == "Task"
+                ):
                     return True, var_value
 
         return False, None
@@ -77,7 +85,7 @@ class CallContext:
             return "task"
         else:
             for frame_info in stack:
-                if frame_info.function == '<module>':
+                if frame_info.function == "<module>":
                     return "module"
             return "standalone"
 
@@ -89,9 +97,9 @@ class CallContext:
                 function_name = frame_info.function
 
                 frame_locals = frame_info.frame.f_locals
-                if 'self' in frame_locals:
-                    obj = frame_locals['self']
-                    if hasattr(obj, '__class__'):
+                if "self" in frame_locals:
+                    obj = frame_locals["self"]
+                    if hasattr(obj, "__class__"):
                         class_name = obj.__class__.__name__
                         function_name = f"{class_name}.{function_name}"
 
