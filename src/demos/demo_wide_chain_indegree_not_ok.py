@@ -13,6 +13,7 @@ from latch.orchestration.constraints import Constraints
 
 # ==================== WIDE CHAIN OF TASKS ====================
 
+
 @task(name="step1_ingest")
 def step1_ingest():
     print(f"[CHAIN] Step 1: Ingesting data from source")

@@ -69,6 +69,7 @@ def demo_incoming_constraints():
     print("DEMO: INCOMING CONSTRAINT VALIDATION")
     print("=" * 60)
 
+
 if __name__ == "__main__":
     root_task_name = setup_task_relationships()
 
