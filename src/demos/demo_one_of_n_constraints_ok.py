@@ -18,8 +18,6 @@ from latch.orchestration.constraints import Constraints
     constraints=Constraints(
         # Allow connections to any 
         allow_outgoing_to_names=["one", "two", "three", "four"],
-        # But limit to only ONE outgoing connection total
-        limit_outdegree=1,
     ),
 )
 def single_router():
@@ -51,26 +49,6 @@ def four():
     time.sleep(2)
 
 
-# ==================== RESULT AGGREGATOR ====================
-
-
-@task(name="result_aggregator")
-def result_aggregator():
-    """Aggregate results from processors."""
-    print("[AGGREGATOR] Aggregating processor results...")
-    time.sleep(1)
-
-
-# ==================== MAIN ORCHESTRATOR ====================
-
-
-@task(name="main")
-def main():
-    """Main orchestrator for simple constraint demo."""
-    print("\n" + "=" * 80)
-    print("DEMO: SIMPLE CONSTRAINT VALIDATION (OUTDEGREE + ALLOWLIST)")
-    print("=" * 80)
-
 # ==================== SETUP FUNCTIONS ====================
 
 
@@ -81,11 +59,9 @@ def setup_relationships():
     try:
         # This should work (first connection)
         single_router.create_path_to(one)
-        print("[SETUP] First connection to One succeeded")
-
-        # This should fail (exceeds outdegree limit of 1)
         single_router.create_path_to(two)
-        print("[SETUP] This should not print - violation should have occurred!")
+        single_router.create_path_to(three)
+        single_router.create_path_to(four)
 
     except Exception as e:
         print(f"[SETUP] Expected outdegree violation caught: {e}")
@@ -93,7 +69,14 @@ def setup_relationships():
 
 
 if __name__ == "__main__":
-    print("\n[MAIN] Testing invalid simple constraint relationships...")
     setup_relationships()
 
-    print("\n[MAIN] Demo completed!")
+    # Create scheduler and execute the entire DAG
+    scheduler = TaskScheduler()
+    scheduler.print_scheduler_status()
+
+    print("\n[MAIN] Executing DAG using scheduler loop...")
+
+    results = scheduler.execute_dag()
+    print(f"\n[MAIN] Execution results: {len(results)} tasks completed")
+

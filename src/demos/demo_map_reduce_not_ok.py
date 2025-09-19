@@ -20,7 +20,7 @@ from latch.orchestration.constraints import Constraints
     ),
 )
 def data_source():
-    print("[SOURCE] Data source preparing data for mapping...")
+    print("[SOURCE] Data source trying to create a path to the reducer directly...")
     data_source.create_path_to(reducer)  # failure case
     time.sleep(2)
 
